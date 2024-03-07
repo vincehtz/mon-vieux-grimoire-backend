@@ -13,8 +13,6 @@ mongoose
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
 
-app.use(express.json());
-
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -27,6 +25,8 @@ app.use((req, res, next) => {
   );
   next();
 });
+
+app.use(express.json());
 
 app.use("/api/books", booksRoutes);
 app.use("/api/auth", userRoutes);

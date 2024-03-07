@@ -5,6 +5,7 @@ exports.addBook = (req, res, next) => {
   const book = new Book({
     ...req.body,
   });
+  console.log(book);
   book
     .save()
     .then(() => res.status(201).json({ message: "Livre enregistré !" }))
