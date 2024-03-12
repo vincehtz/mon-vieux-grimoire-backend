@@ -31,7 +31,7 @@ exports.addOneBook = (req, res, next) => {
     ...bookObject,
     userId: req.auth.userId,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
+      req.file.filename + req.file.addedName
     }`,
   });
   book
@@ -91,6 +91,37 @@ exports.deleteBook = (req, res, next) => {
     });
 };
 
-// exports.addRating = (req, res, next) => {
+exports.addRating = (req, res, next) => {
+  const userId = req.auth.userId;
+  const { rating } = req.body;
+  const userRating = { userId, grade: rating };
+  Book.findOne({ _id: req.params.id })
+    .then((book) => {
+      for (let i = 0; i < book.ratings.length; i++) {
+        if (book.ratings[i].userId === userId) {
+          return res.status(403).json({ message: "Vous avez déjà noté !" });
+        }
+      }
+      Book.findByIdAndUpdate(
+        { _id: req.params.id },
+        { $push: { ratings: userRating } },
+        { new: true }
+      ).then((book) => {
+        if (!book) {
+          return res.status(404).json({ message: "Livre non trouvé" });
+        }
+        const sumRatings = book.ratings.reduce(
+          (sum, rating) => sum + rating.grade,
+          0
+        );
+        book.averageRating = sumRatings / book.ratings.length;
+        book
+          .save()
+          .then(() => res.status(200).json(book))
+          .catch((error) => res.status(500).json({ error }));
+      });
+    })
+    .catch((error) => res.status(404).json({ error }));
+};
 
 // };
