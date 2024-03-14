@@ -23,6 +23,7 @@ module.exports = (req, res, next) => {
       }
       fs.unlinkSync(imagePath);
       req.file.path = imageName + "_resized" + extension; // Mise à jour du chemin de l'image dans la requête
+      req.file.filename = imageName + "_resized" + extension; // Mise à jour du nom de l'image dans la requête
       next();
     });
 };
