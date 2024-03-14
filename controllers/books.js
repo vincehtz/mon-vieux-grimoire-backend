@@ -57,11 +57,18 @@ exports.modifyBook = (req, res, next) => {
       if (book.userId != req.auth.userId) {
         res.status(401).json({ message: "Non-authorisé" });
       } else {
+        const oldImagePath = book.imageUrl.replace(
+          `${req.protocol}://${req.get("host")}/`,
+          ""
+        ); // Obtenir le chemin de l'ancienne image
         Book.updateOne(
           { _id: req.params.id },
           { ...bookObject, _id: req.params.id }
         )
-          .then(() => res.status(200).json({ message: "Objet modifié !" }))
+          .then(() => {
+            fs.unlinkSync(oldImagePath); // Supprimer l'ancienne image
+            res.status(200).json({ message: "Objet modifié !" });
+          })
           .catch((error) => {
             res.status(500).json({ error });
           });
