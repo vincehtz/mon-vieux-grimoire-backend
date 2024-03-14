@@ -22,8 +22,8 @@ module.exports = (req, res, next) => {
           .json({ error: "Erreur lors du traitement de l'image." });
       }
       fs.unlinkSync(imagePath);
-      req.file.path = imageName + "_resized" + newExtension; // Mise à jour du chemin de l'image dans la requête
-      req.file.filename = imageName + "_resized" + newExtension; // Mise à jour du nom de l'image dans la requête
+      req.file.path = imageName + "_resized" + newExtension;
+      req.file.filename = imageName + "_resized" + newExtension;
       next();
     });
 };
