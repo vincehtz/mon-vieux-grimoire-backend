@@ -9,8 +9,8 @@ module.exports = (req, res, next) => {
   const lastDot = imagePath.lastIndexOf(".");
   const extension = imagePath.substring(lastDot);
   sharp(imagePath)
-    // Ajoutez ici les opérations de traitement d'image avec Sharp
-    .resize(300, 200, { fit: "inside" }) // Exemple : redimensionnement de l'image
+    .toFormat("webp", { quality: 50 })
+    .resize(300, 500, { fit: "inside" })
     .toFile(imagePath + "-resized" + extension, (err, info) => {
       if (err) {
         console.log(err);
