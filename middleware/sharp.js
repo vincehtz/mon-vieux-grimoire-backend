@@ -8,13 +8,13 @@ module.exports = (req, res, next) => {
 
   const imagePath = req.file.path;
   const lastDot = imagePath.lastIndexOf(".");
-  const extension = imagePath.substring(lastDot);
   const imageName = imagePath.substring(0, lastDot);
+  const newExtension = ".webp";
 
   sharp(imagePath)
-    .resize({ width: 800 })
+    .resize(300, 500, { fit: "inside" })
     .toFormat("webp")
-    .toFile(imageName + "_resized" + extension, (err, info) => {
+    .toFile(imageName + "_resized" + newExtension, (err, info) => {
       if (err) {
         console.error(err);
         return res
@@ -22,8 +22,8 @@ module.exports = (req, res, next) => {
           .json({ error: "Erreur lors du traitement de l'image." });
       }
       fs.unlinkSync(imagePath);
-      req.file.path = imageName + "_resized" + extension; // Mise à jour du chemin de l'image dans la requête
-      req.file.filename = imageName + "_resized" + extension; // Mise à jour du nom de l'image dans la requête
+      req.file.path = imageName + "_resized" + newExtension; // Mise à jour du chemin de l'image dans la requête
+      req.file.filename = imageName + "_resized" + newExtension; // Mise à jour du nom de l'image dans la requête
       next();
     });
 };
