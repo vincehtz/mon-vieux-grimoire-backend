@@ -30,9 +30,7 @@ exports.addOneBook = (req, res, next) => {
   const book = new Book({
     ...bookObject,
     userId: req.auth.userId,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename + req.file.addedName
-    }`,
+    imageUrl: `${req.protocol}://${req.get("host")}/${req.file.filename}`,
   });
   book
     .save()
@@ -46,9 +44,7 @@ exports.modifyBook = (req, res, next) => {
   const bookObject = req.file
     ? {
         ...JSON.parse(req.body.book),
-        imageUrl: `${req.protocol}://${req.get("host")}/images/${
-          req.file.filename
-        }`,
+        imageUrl: `${req.protocol}://${req.get("host")}/${req.file.filename}`,
       }
     : { ...req.body };
   delete bookObject._userId;
@@ -57,11 +53,18 @@ exports.modifyBook = (req, res, next) => {
       if (book.userId != req.auth.userId) {
         res.status(401).json({ message: "Non-authorisé" });
       } else {
+        const oldImagePath = book.imageUrl.replace(
+          `${req.protocol}://${req.get("host")}/`,
+          ""
+        ); // Obtenir le chemin de l'ancienne image
         Book.updateOne(
           { _id: req.params.id },
           { ...bookObject, _id: req.params.id }
         )
-          .then(() => res.status(200).json({ message: "Objet modifié !" }))
+          .then(() => {
+            fs.unlinkSync(oldImagePath); // Supprimer l'ancienne image
+            res.status(200).json({ message: "Objet modifié !" });
+          })
           .catch((error) => {
             res.status(500).json({ error });
           });

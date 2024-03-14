@@ -1,4 +1,5 @@
 const multer = require("multer");
+const fs = require("fs");
 
 const MIME_TYPES = {
   "image/jpg": "jpg",
@@ -15,7 +16,8 @@ const storage = multer.diskStorage({
     const originalName = file.originalname;
     const extension = MIME_TYPES[file.mimetype];
     const newName = originalName.replace(/\.[^.]+$/, "_");
-    callback(null, newName + Date.now() + "." + extension);
+    const finalName = newName + Date.now() + "." + extension;
+    callback(null, finalName);
   },
 });
 
